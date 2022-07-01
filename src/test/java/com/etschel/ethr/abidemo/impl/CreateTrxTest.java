@@ -29,11 +29,4 @@ public class CreateTrxTest {
         byte[] encode = TransactionEncoder.encode(transaction);
         System.out.println(Hex.encodeHexString(encode));
     }
-
-    void testCreateType() throws Exception {
-        Class<? extends Type> address = AbiTypes.getType("address");
-        Method value = address.getDeclaredMethod("getValue");
-        address.getConstructor()
-
-    }
 }

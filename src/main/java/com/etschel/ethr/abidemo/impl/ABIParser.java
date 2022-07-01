@@ -69,7 +69,6 @@ public class ABIParser {
             }
         });
 
-        new Utf8String("Tom");
         Function func = new Function(
                 abiFunction.getName(),
                 inputTypes,
@@ -82,13 +81,6 @@ public class ABIParser {
         return Hex.encodeHexString(encode);
     }
 
-    private Optional<AbiFunction> findFunctionByName(@NonNull UUID id, @NonNull String name) {
-        return findFunctions(id)
-                .stream()
-                .filter(f -> name.equals(f.getName()))
-                .findFirst();
-    }
-
     private List<AbiFunction> findFunctions(@NonNull UUID id) {
         JsonNode abi = holder.findByID(id).orElseThrow(EntityNotFoundException::new);
         if (abi.isEmpty()) {
@@ -98,6 +90,13 @@ public class ABIParser {
         return abiFunctions.stream()
                 .filter(f -> "function".equals(f.getType()))
                 .collect(Collectors.toList());
+    }
+
+    private Optional<AbiFunction> findFunctionByName(@NonNull UUID id, @NonNull String name) {
+        return findFunctions(id)
+                .stream()
+                .filter(f -> name.equals(f.getName()))
+                .findFirst();
     }
 
     private String findTypeForName(@NonNull AbiFunction function, @NonNull String name) {
