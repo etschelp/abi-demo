@@ -10,16 +10,21 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import org.apache.commons.codec.binary.Hex;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.web3j.abi.FunctionEncoder;
-import org.web3j.abi.datatypes.*;
+import org.web3j.abi.datatypes.Address;
+import org.web3j.abi.datatypes.Function;
+import org.web3j.abi.datatypes.Type;
 import org.web3j.abi.datatypes.generated.Uint256;
 import org.web3j.crypto.RawTransaction;
 import org.web3j.crypto.TransactionEncoder;
 
+import javax.inject.Inject;
 import java.math.BigInteger;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Component
@@ -32,10 +37,14 @@ public class ABIParser {
 
     private final InMemoryRepository holder;
 
-    @Autowired
+    @Inject
     public ABIParser(ObjectMapper mapper, InMemoryRepository holder) {
         this.mapper = mapper;
         this.holder = holder;
+    }
+
+    public UUID saveABI(@NonNull JsonNode abi) {
+        return holder.saveABI(abi);
     }
 
     public List<String> findFunctionNames(@NonNull UUID id) {
@@ -102,8 +111,8 @@ public class ABIParser {
     private String findTypeForName(@NonNull AbiFunction function, @NonNull String name) {
         return function.getInputs()
                 .stream()
-                .map(AbiFunction.InOuts::getName)
-                .filter(name::equals)
+                .filter(io -> name.equals(io.getName()))
+                .map(AbiFunction.InOuts::getType)
                 .findFirst()
                 .orElseThrow();
     }

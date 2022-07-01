@@ -5,7 +5,6 @@ import com.etschel.ethr.abidemo.controller.api.InvokeABIFunctionRequest;
 import com.etschel.ethr.abidemo.controller.api.InvokeABIFunctionResponse;
 import com.etschel.ethr.abidemo.controller.api.PersistABIResponse;
 import com.etschel.ethr.abidemo.impl.ABIParser;
-import com.etschel.ethr.abidemo.persistence.InMemoryRepository;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -18,13 +17,10 @@ import java.util.UUID;
 @RestController
 public class ABIController {
 
-    private final InMemoryRepository holder;
-
     private final ABIParser abiParser;
 
     @Autowired
-    public ABIController(InMemoryRepository holder, ABIParser abiParser) {
-        this.holder = holder;
+    public ABIController(ABIParser abiParser) {
         this.abiParser = abiParser;
     }
 
@@ -33,7 +29,7 @@ public class ABIController {
             produces = MediaType.APPLICATION_JSON_VALUE,
             consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<PersistABIResponse> saveABI(@RequestBody JsonNode abi) {
-        UUID abiId = holder.saveABI(abi);
+        UUID abiId = abiParser.saveABI(abi);
         return ResponseEntity.ok(PersistABIResponse.from(abiId));
     }
 
