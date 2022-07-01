@@ -26,14 +26,17 @@ public class ABIParser {
     public static final TypeReference<List<AbiFunction>> ABI_FUNCTION_LIST = new TypeReference<>() {
     };
 
+    private final ObjectMapper mapper;
 
-    @Autowired
-    private ObjectMapper mapper;
-
-    @Autowired
-    private InMemoryRepository holder;
+    private final InMemoryRepository holder;
 
     private final Gson gson = new GsonBuilder().create();
+
+    @Autowired
+    public ABIParser(ObjectMapper mapper, InMemoryRepository holder) {
+        this.mapper = mapper;
+        this.holder = holder;
+    }
 
     public List<String> findFunctionNames(@NonNull UUID id) {
         JsonNode abi = holder.findByID(id).orElseThrow(EntityNotFoundException::new);
@@ -50,13 +53,11 @@ public class ABIParser {
         return Optional.empty();
     }
 
-
-
     public List<AbiFunction> getFunctions(String abi) {
         JsonObject root = gson.fromJson(abi, JsonObject.class);
         JsonArray parts = root.getAsJsonArray();
         parts.forEach(el -> {
-            if (el.getAsJsonObject().has("type") && el.getAsJsonObject().get("type").getAsString() == "function") {
+            if (el.getAsJsonObject().has("type") && el.getAsJsonObject().get("type").getAsString().equals("function")) {
                 String name = el.getAsJsonObject().get("name").getAsString();
                 Map<String, Class<? extends Type>> inputTypes = new HashMap<>();
                 JsonArray input = el.getAsJsonObject().get("input").getAsJsonArray();

@@ -1,6 +1,8 @@
 package com.etschel.ethr.abidemo.controller;
 
 import com.etschel.ethr.abidemo.controller.api.ABIFunctionsResponse;
+import com.etschel.ethr.abidemo.controller.api.InvokeABIFunctionRequest;
+import com.etschel.ethr.abidemo.controller.api.InvokeABIFunctionResponse;
 import com.etschel.ethr.abidemo.controller.api.PersistABIResponse;
 import com.etschel.ethr.abidemo.impl.ABIParser;
 import com.etschel.ethr.abidemo.persistence.InMemoryRepository;
@@ -10,6 +12,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -25,20 +28,31 @@ public class ABIController {
         this.abiParser = abiParser;
     }
 
-    @PostMapping(value = "/abi", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(
+            value = "/abi",
+            produces = MediaType.APPLICATION_JSON_VALUE,
+            consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<PersistABIResponse> saveABI(@RequestBody JsonNode abi) {
         UUID abiId = holder.saveABI(abi);
-        return ResponseEntity.ok(new PersistABIResponse(abiId));
+        return ResponseEntity.ok(PersistABIResponse.from(abiId));
     }
 
-    @GetMapping("/{id}/functions")
+    @GetMapping(
+            value = "/{id}/functions",
+            produces = MediaType.APPLICATION_JSON_VALUE)
     public ABIFunctionsResponse findABIFunctions(@PathVariable UUID id) {
-        return ABIFunctionsResponse.from(abiParser.findFunctionNames(id));
+        List<String> functionNames = abiParser.findFunctionNames(id);
+        return ABIFunctionsResponse.from(functionNames);
     }
 
-    @PutMapping("/{id}/functions/{abiFunctionName}")
-    public String invokeABIFunctionByName(@PathVariable UUID id, @PathVariable(name = "abiFunctionName") String name) {
-
+    @PutMapping(
+            value = "/{id}/functions/{abiFunctionName}",
+            produces = MediaType.APPLICATION_JSON_VALUE,
+            consumes = MediaType.APPLICATION_JSON_VALUE)
+    public InvokeABIFunctionResponse invokeABIFunctionByName(
+            @PathVariable UUID id,
+            @PathVariable(name = "abiFunctionName") String name,
+            @RequestBody InvokeABIFunctionRequest request) {
         return null;
     }
 
