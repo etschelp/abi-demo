@@ -53,7 +53,8 @@ public class ABIController {
             @PathVariable UUID id,
             @PathVariable(name = "abiFunctionName") String name,
             @RequestBody InvokeABIFunctionRequest request) {
-        return null;
+        String hexTrx = abiParser.invokeFunctionByName(id, name, request);
+        return InvokeABIFunctionResponse.from(hexTrx);
     }
 
 }
